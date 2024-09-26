@@ -1,0 +1,55 @@
+name: Deploy HTML files to GitHub Pages
+
+on:
+  # push:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # 检出主仓库（网页所在仓库）到./main路径
+      - name: Checkout
+        uses: actions/checkout@main
+        with: 
+          path: main
+      # 检出私有仓库（保密资源所在仓库）到./src路径
+      - name: Checkout src
+        uses: actions/checkout@main
+        with: 
+          repository: Tian-Lingxiang/tlx
+          # `Repo_Sec` is Repository_Secrets of the website-repo(main)
+          # Github_Token ==> Contents read_only
+          token: ${{ secrets.Repo_Sec }} 
+          path: src
+      # 将所有资源文件整合到一个temp文件夹中，并保留index.html作为入口
+      - name: Move HTML files to temp directory
+        run: |
+          ls -l -a
+          rm -rf ./tlx/.git
+          mkdir temp
+          cp ./main/index.html ./temp/
+          cp -r ./main/img ./temp
+          cp -r ./tlx ./temp
+      # 将整合好的temp文件夹作为 Artifact 上传
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@main
+        with:
+          path: './temp'
+      # 将文件部署到GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@main
