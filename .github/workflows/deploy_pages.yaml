@@ -1,7 +1,7 @@
 name: Deploy HTML files to GitHub Pages
 
 on:
-  # push:
+  push:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -27,23 +27,23 @@ jobs:
         with: 
           path: main
       # 检出私有仓库（保密资源所在仓库）到./src路径
-      - name: Checkout src
+      - name: Checkout img_src
         uses: actions/checkout@main
         with: 
-          repository: Tian-Lingxiang/tlx
+          repository: Tian-Lingxiang/img_src
           # `Repo_Sec` is Repository_Secrets of the website-repo(main)
           # Github_Token ==> Contents read_only
           token: ${{ secrets.Repo_Sec }} 
-          path: src
+          path: img_src
       # 将所有资源文件整合到一个temp文件夹中，并保留index.html作为入口
       - name: Move HTML files to temp directory
         run: |
           ls -l -a
-          rm -rf ./tlx/.git
+          rm -rf ./img_src/.git
           mkdir temp
           cp ./main/index.html ./temp/
-          cp -r ./main/img ./temp
-          cp -r ./tlx ./temp
+          # cp -r ./main/img ./temp
+          cp -r ./img_src ./temp
       # 将整合好的temp文件夹作为 Artifact 上传
       - name: Upload artifact
         uses: actions/upload-pages-artifact@main
