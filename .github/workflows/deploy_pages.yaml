@@ -42,7 +42,7 @@ jobs:
           rm -rf ./img_src/.git
           mkdir temp
           cp ./main/index.html ./temp/
-          # cp -r ./main/img ./temp
+          cp -r ./main/src ./temp
           cp -r ./img_src ./temp
       # 将整合好的temp文件夹作为 Artifact 上传
       - name: Upload artifact
